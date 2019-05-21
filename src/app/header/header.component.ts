@@ -1,4 +1,5 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -7,7 +8,20 @@ import {Component} from '@angular/core';
   styleUrls: ['./header.component.css']
 })
 
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
+  @Output() onPageChange: EventEmitter<string>  = new EventEmitter<string>();
+  @Input() activePage;
+
+  constructor(private router: Router) {
+
+  }
+
+  ngOnInit() {
+  }
+
+  onSelect(page) {
+    this.onPageChange.emit(page);
+  }
 
 }
 
