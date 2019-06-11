@@ -23,4 +23,10 @@ export class ShoppingListService {
     this.ingredients.push(ingredient);
     this.ingredientAdded.emit(this.ingredients.slice());
   }
+
+  addMultipleIngredient(ingredients: Ingredient[]) {
+    this.ingredients.push(...ingredients);
+    // this.ingredients = this.ingredients.concat(ingredients);
+    this.ingredientAdded.emit(this.ingredients.slice());
+  }
 }
