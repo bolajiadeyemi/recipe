@@ -19,7 +19,7 @@ export class RecipesService {
   recipeSelected = new EventEmitter<Recipe>();
 
 
-  constructor( private shoppingListService: ShoppingListService) {
+  constructor(private shoppingListService: ShoppingListService) {
     this.selectedRecipe = new Subject();
   }
 
@@ -31,13 +31,17 @@ export class RecipesService {
     this.shoppingListService.addMultipleIngredient(ingredients);
   }
 
+  getRecipeById(id) {
+    return  this.recipes[id];
+  }
+
   setSelectedRecipe(recipe: Recipe) {
     // this.selectedRecipe.next(recipe);
     this.recipeSelected.emit(recipe);
 
   }
 
-/*  getSelectedRecipe() {
-    return this.selectedRecipe.asObservable();
-  }*/
+  /*  getSelectedRecipe() {
+      return this.selectedRecipe.asObservable();
+    }*/
 }
