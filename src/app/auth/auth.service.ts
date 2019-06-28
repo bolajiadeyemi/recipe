@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { BehaviorSubject, throwError } from 'rxjs';
 import { User } from './user.model';
+import { Router } from '@angular/router';
 
 const API_KEY = 'AIzaSyDfkpuKQNTuZTcY0K0uNApLwM7yxR56qWc';
 
@@ -21,7 +22,8 @@ export interface AuthtResponseData {
 })
 export class AuthService {
   user = new BehaviorSubject<User>(null);
-  constructor(private http: HttpClient) {}
+  private tokenExiprationTimer: any;
+  constructor(private http: HttpClient, private router: Router) {}
 
   createUser(email: string, password: string) {
     return this.http
@@ -34,16 +36,46 @@ export class AuthService {
         }
       )
       .pipe(
+        catchError(this.handleError),
         tap(response => {
+          console.log(response);
+
           this.handleAuthentication(
             response.email,
             response.localId,
             response.idToken,
-            +response.expiresIn
+            +response.expiresIn || 3600
           );
-        }),
-        catchError(this.handleError)
+        })
       );
+  }
+
+  autoLogin() {
+    const userData: {
+      email: string;
+      id: string;
+      _token: string;
+      _tokenExpirationDate: string;
+    } = JSON.parse(localStorage.getItem('userData'));
+
+    if (!userData) {
+      return;
+    }
+
+    const loadedUser = new User(
+      userData.email,
+      userData.id,
+      userData._token,
+      new Date(userData._tokenExpirationDate)
+    );
+
+    if (loadedUser.token) {
+      this.user.next(loadedUser);
+      const expirationDuration =
+        new Date(userData._tokenExpirationDate).getTime() -
+        new Date().getTime();
+      this.autoLogout(expirationDuration);
+    }
   }
 
   loginUser(email: string, password: string) {
@@ -57,27 +89,30 @@ export class AuthService {
         }
       )
       .pipe(
+        catchError(this.handleError),
         tap(response => {
+          console.log(response);
           this.handleAuthentication(
             response.email,
             response.localId,
             response.idToken,
-            +response.expiresIn
+            +response.expiresIn || 3600
           );
-        }),
-        catchError(this.handleError)
+        })
       );
   }
 
   private handleAuthentication(
     email: string,
-    id,
+    userId,
     token: string,
     expiresIn: number
   ) {
-    const expirationDate = new Date(new Date().getTime() + +expiresIn * 1000);
-    const user = new User(email, id, token, expirationDate);
+    const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+    const user = new User(email, userId, token, expirationDate);
     this.user.next(user);
+    this.autoLogout(expiresIn * 1000);
+    localStorage.setItem('userData', JSON.stringify(user));
   }
 
   private handleError(errResponse: HttpErrorResponse) {
@@ -103,5 +138,24 @@ export class AuthService {
     }
 
     return throwError(errorMessage);
+  }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
+    localStorage.removeItem('userData');
+
+    if (this.tokenExiprationTimer) {
+      clearTimeout(this.tokenExiprationTimer);
+    }
+
+    this.tokenExiprationTimer = null;
+  }
+
+  autoLogout(expirationDuration: number) {
+    console.log(expirationDuration);
+    this.tokenExiprationTimer = setTimeout(() => {
+      this.logout();
+    }, expirationDuration);
   }
 }
