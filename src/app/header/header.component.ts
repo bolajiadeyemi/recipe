@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Router} from '@angular/router';
+import {DataStorageService} from '../shared/data-storage.service';
 
 
 @Component({
@@ -9,10 +10,10 @@ import {Router} from '@angular/router';
 })
 
 export class HeaderComponent implements OnInit {
-  @Output() onPageChange: EventEmitter<string>  = new EventEmitter<string>();
+  @Output() onPageChange: EventEmitter<string> = new EventEmitter<string>();
   @Input() activePage;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private dataStorageService: DataStorageService) {
 
   }
 
@@ -21,6 +22,15 @@ export class HeaderComponent implements OnInit {
 
   onSelect(page) {
     this.onPageChange.emit(page);
+  }
+
+  onSaveData() {
+    this.dataStorageService.saveRecipes();
+  }
+
+  onFetchData() {
+    this.dataStorageService.fetchRecipes()
+      .subscribe( );
   }
 
 }
