@@ -94,7 +94,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.closeSub = componentRef.instance.close.subscribe(() => {
       this.closeSub.unsubscribe();
       hostViewContainerRef.clear();
-      //this.onHandleError();
+      // this.onHandleError();
     });
   }
 }
