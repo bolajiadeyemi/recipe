@@ -4,28 +4,45 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { HttpClientModule } from '@angular/common/http';
-import { AuthComponent } from './auth/auth.component';
-import { AlertComponent } from './shared/alert/alert.component';
-import { RecipesModule } from './recipes/recipes.module';
-import { ShoppingListModule } from './shopping-list/shopping-list.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, AuthComponent],
+  declarations: [AppComponent, HeaderComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    RecipesModule,
-    ShoppingListModule,
-    FormsModule,
-    ReactiveFormsModule,
     SharedModule,
     CoreModule
   ],
-  entryComponents: [AlertComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
+
+/*
+
+Alternative Lazy Loading Syntax
+If you're using Angular 8+, you can use an alternative syntax for specifying lazy-loaded routes:
+
+Instead of
+
+const routes: Routes = [{
+  path: 'your-path',
+  loadChildren: './your-module-path/module-name.module#ModuleName'
+}];
+you can use
+
+const routes: Routes = [{
+  path: 'your-path',
+  loadChildren: () => import('./your-module-path/module-name.module').then(m => m.ModuleName)
+}];
+Please note, that you need to ensure that in your tsconfig.json file, you use
+
+"module": "esnext",
+instead of
+
+"module": "es2015",
+Why would you use this syntax? In the future, it'll replace the "string-only" approach (i.e. the first alternative mentioned here). It also will give you better IDE support.
+
+*/
