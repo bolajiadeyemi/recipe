@@ -4,6 +4,7 @@ import { ShoppingEditComponent } from './shopping-edit/shopping-edit.component';
 import { ShoppingListRoutingModule } from './shopping-list-routing.module';
 import { SharedModule } from '../shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoggingService } from '../logging.service';
 
 @NgModule({
   declarations: [ShoppingListComponent, ShoppingEditComponent],
@@ -12,6 +13,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     SharedModule,
     FormsModule,
     ReactiveFormsModule
-  ]
+  ],
+  providers: [LoggingService]
 })
 export class ShoppingListModule {}
